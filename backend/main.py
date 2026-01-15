@@ -6,6 +6,11 @@ import os
 import pytesseract
 from PIL import Image
 import speech_recognition as sr
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+GOOGLE_API_KEY = os.getenv("GOOGLE_SPEECH_API_KEY")
 
 # Optional: python-levenshtein for better string matching
 try:
@@ -122,13 +127,13 @@ async def analyze_speech(audio: UploadFile = File(...), reference_text: str = Fo
         try:
             # Recognize speech using Google Web Speech API
             # Ideally try to detect language or use a generic one, or loop through expected
-            spoken_text = recognizer.recognize_google(audio_data, language="ar-SA") # Try Arabic first, or default
+            spoken_text = recognizer.recognize_google(audio_data, language="ar-SA", key=GOOGLE_API_KEY) # Try Arabic first, or default
         except sr.UnknownValueError:
             spoken_text = ""
         except sr.RequestError as e:
             # Fallback to English/default if Arabic fails or just report error
             try:
-                 spoken_text = recognizer.recognize_google(audio_data)
+                 spoken_text = recognizer.recognize_google(audio_data, key=GOOGLE_API_KEY)
             except:
                  spoken_text = ""
             

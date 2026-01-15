@@ -5,3 +5,4 @@ pytesseract
 SpeechRecognition
 Pillow
 python-levenshtein
+python-dotenv

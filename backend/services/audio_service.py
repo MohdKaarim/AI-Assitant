@@ -4,6 +4,10 @@ import Levenshtein
 import io
 import tempfile
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+GOOGLE_API_KEY = os.getenv("GOOGLE_SPEECH_API_KEY")
 
 class AudioService:
     @staticmethod
@@ -33,7 +37,7 @@ class AudioService:
                 try:
                     # Using Google Speech Recognition (requires internet)
                     # For offline, one would need pocketsphinx or similar
-                    transcribed_text = recognizer.recognize_google(audio_data)
+                    transcribed_text = recognizer.recognize_google(audio_data, key=GOOGLE_API_KEY)
                 except sr.UnknownValueError:
                     return {
                         "score": 0,
