@@ -1,0 +1,15 @@
+<div class="surah-list-container">
+  <h2>Select a Surah</h2>
+  <div class="surah-grid">
+    <div 
+      *ngFor="let surah of surahs" 
+      class="surah-card glass-panel"
+      (click)="selectSurah(surah)"
+      [class.selected]="selectedSurah?.number === surah.number">
+      <div class="surah-number">{{ surah.number }}</div>
+      <h3 class="surah-name-arabic">{{ surah.name_arabic }}</h3>
+      <p class="surah-name-english">{{ surah.name_english }}</p>
+      <span class="verse-count">{{ surah.verses_count }} verses</span>
+    </div>
+  </div>
+</div>

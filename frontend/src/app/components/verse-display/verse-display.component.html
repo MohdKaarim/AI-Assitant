@@ -1,0 +1,96 @@
+<div class="verse-container" *ngIf="surahData">
+  <div class="surah-mini-header">
+    <h2>{{ surahData.name_arabic }} — {{ surahData.name_english }}</h2>
+    <div class="verse-nav-compact">
+      <button (click)="previousVerse()" [disabled]="currentVerseIndex === 0">←</button>
+      <span>Ayah {{ currentVerse?.number }} / {{ surahData.verses_count }}</span>
+      <button (click)="nextVerse()" [disabled]="currentVerseIndex === surahData.verses.length - 1">→</button>
+    </div>
+  </div>
+
+  <div class="main-workspace" *ngIf="currentVerse">
+    <!-- Unified Study Card -->
+    <div class="verse-study-card glass-panel">
+      <div class="verse-body">
+        <div 
+          class="verse-arabic-area" 
+          [class.listening]="isPlayingReference" 
+          [class.recording]="isRecording">
+          
+          <div class="verse-arabic-words">
+            <div 
+              *ngFor="let wordObj of displayWords; let i = index" 
+              class="word-unit"
+              [class.active]="i === activeWordIndex">
+              <span 
+                class="arabic-word"
+                [class.highlight]="i === activeWordIndex"
+                [class.correct]="(wordAccuracies[i] ?? -1) >= 0.8"
+                [class.medium]="(wordAccuracies[i] ?? -1) >= 0.5 && (wordAccuracies[i] ?? -1) < 0.8"
+                [class.incorrect]="(wordAccuracies[i] ?? 1.1) < 0.5">
+                {{ wordObj.arabic }}
+              </span>
+              <span class="word-meaning" *ngIf="wordObj.english">
+                {{ wordObj.english }}
+              </span>
+            </div>
+          </div>
+
+          <div class="state-badge" *ngIf="isPlayingReference || isRecording">
+            {{ isPlayingReference ? '👂 Listening' : '🎤 Recording' }}
+          </div>
+        </div>
+        
+        <div class="verse-translations">
+          <p class="verse-transliteration" *ngIf="currentVerse.text_transliteration">
+            {{ currentVerse.text_transliteration }}
+          </p>
+          <p class="verse-english-main">{{ currentVerse.text_english }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full-Width Recorder Section -->
+    <div class="recorder-section glass-panel">
+      <app-audio-recorder 
+        [audioUrl]="currentVerse.audio_url || null"
+        [isPlaying]="isPlayingReference"
+        [isPaused]="isPaused"
+        (listenRequested)="playReference()"
+        (pauseRequested)="pauseReference()"
+        (resumeRequested)="resumeReference()"
+        (recordingStateChanged)="onRecordingStateChanged($event)"
+        (audioRecorded)="onAudioRecorded($event)">
+      </app-audio-recorder>
+    </div>
+  </div>
+
+  <!-- Feedback Section (Full Width Below) -->
+  <div class="feedback-area" *ngIf="showFeedback || isAnalyzing">
+    <div *ngIf="isAnalyzing" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Analyzing...</p>
+    </div>
+
+    <div *ngIf="showFeedback && !isAnalyzing" class="feedback-panel glass-panel fade-in">
+      <div class="score-display">
+        <div class="score-circle" [class.good]="(matchScore ?? 0) >= 70" [class.medium]="(matchScore ?? 0) >= 50 && (matchScore ?? 0) < 70" [class.low]="(matchScore ?? 0) < 50">
+          <span class="score-value">{{ matchScore }}%</span>
+          <span class="score-label">Match</span>
+        </div>
+        <div class="feedback-info">
+          <p class="spoken-text">You said: <strong>{{ spokenText }}</strong></p>
+          <p class="feedback-message" *ngIf="(matchScore ?? 0) >= 70">Excellent! Moving soon...</p>
+          <p class="feedback-message" *ngIf="(matchScore ?? 0) < 70 && (matchScore ?? 0) >= 50">Good! Try for higher.</p>
+          <p class="feedback-message" *ngIf="(matchScore ?? 0) < 50">Keep practicing.</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="mistakes && mistakes.length > 0" class="mistakes-panel glass-panel">
+      <div *ngFor="let mistake of mistakes" class="mistake-item" [class]="'severity-' + mistake.severity">
+        <strong>{{ mistake.error_type }}</strong>: {{ getTajweedMessage(mistake.error_type) }}
+      </div>
+    </div>
+  </div>
+</div>

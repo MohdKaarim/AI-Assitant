@@ -1,0 +1,29 @@
+<div class="recorder-container glass-panel">
+  <h3>Recite</h3>
+  
+  <div class="visualizer" [class.recording]="isRecording">
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+  </div>
+
+  <div class="controls-grid">
+    <button 
+      class="btn-listen" 
+      [disabled]="!audioUrl || isRecording"
+      (click)="onListenToggle()">
+      <span class="icon">{{ isPlaying ? (isPaused ? '▶️' : '⏸️') : '🔊' }}</span>
+      {{ isPlaying ? (isPaused ? 'Resume' : 'Pause') : 'Listen First' }}
+    </button>
+
+    <button 
+      class="btn-accord" 
+      [class.recording-btn]="isRecording"
+      (click)="toggleRecording()">
+      <span class="icon">{{ isRecording ? '⏹️' : '🎤' }}</span>
+      {{ isRecording ? 'Stop Recording' : 'Start Reading' }}
+    </button>
+  </div>
+  
+  <p class="status-text">{{ statusText }}</p>
+</div>
